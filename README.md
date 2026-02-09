@@ -15,7 +15,7 @@
         - [ ] POST /session/<TOKEN>
             - INPUT: CORDS
             - OUTPUT: OK/NOT OK -> could be done via HTTP status
-    - [ ] GET /health
+    - [X] GET /health
         - OUTPUT: "OK", RUNTIME
 - [ ] document with swagger
 #### storage
