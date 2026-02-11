@@ -10,6 +10,8 @@ import (
 
 type session struct {
 	Token           string    `json:"token"`
+	Latitude        float32   `json:"latitude"`
+	Longitude       float32   `json:"longitude"`
 	TTL             int       `json:"ttl"`
 	TerminationTime int       `json:"termination_time"`
 	LastUpdate      time.Time `json:"last_update"`
@@ -42,7 +44,9 @@ func postSessionCreate(c *gin.Context) {
 		return
 	}
 
-	newSession.Token = "use-token-generation-here" // use 128-bit key?
+	newSession.Token = "use-token-generation-here" // use 128-bit key
+
+	// TODO: administer latitude and longitude
 
 	// TODO: dont directly modify sessions[]
 	sessions = append(sessions, newSession)
