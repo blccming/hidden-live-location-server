@@ -31,3 +31,22 @@
 - Use links to share location session => make link directly redirect to app (through some href? no idea how that works from backend / web server)
 - Would it be worth it to use Valkey instead of Redis?
 - Be aware of directory traversal attacks (could already be protected by gin, not sure about that though)
+
+### Development
+Install docker with docker compose if not already installed.
+```sh
+curl -fsSL https://get.docker.com | sh
+```
+
+Configure your Cloudflare Zero Trust Token in `docker/.env` and start the container.
+```sh
+cd docker
+mv .env.example .env
+nano .env
+docker compose up -d
+```
+
+Now the project can be executed while being available via your domain.
+```sh
+go run .
+```

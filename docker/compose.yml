@@ -1,0 +1,7 @@
+---
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    network_mode: host # VERY VERY TEMPORARY, REMOVE ASAP
