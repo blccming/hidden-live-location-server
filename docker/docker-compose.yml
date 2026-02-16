@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .  # Baue das Docker-Image basierend auf dem Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"  # Host- zu Container-Port-Mapping
+    depends_on:
+      - redis
