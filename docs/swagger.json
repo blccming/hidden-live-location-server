@@ -1,0 +1,117 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Returns service health and runtime information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sessions/create": {
+            "post": {
+                "description": "Creates a new session with the given TTL and session timeout",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sessions"
+                ],
+                "summary": "Create a new session",
+                "parameters": [
+                    {
+                        "description": "Session create payload",
+                        "name": "sessionParams",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.SessionCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.SessionCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "invalid json"
+                }
+            }
+        },
+        "main.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "runtime": {
+                    "type": "string",
+                    "example": "38271.133967079s"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "OK"
+                }
+            }
+        },
+        "main.SessionCreateRequest": {
+            "type": "object",
+            "properties": {
+                "session_timeout": {
+                    "type": "integer",
+                    "example": 7200
+                },
+                "ttl": {
+                    "type": "integer",
+                    "example": 3600
+                }
+            }
+        },
+        "main.SessionCreateResponse": {
+            "type": "object",
+            "properties": {
+                "parameters": {
+                    "$ref": "#/definitions/main.SessionCreateRequest"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "3A9N2O"
+                }
+            }
+        }
+    }
+}

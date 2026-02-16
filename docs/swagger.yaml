@@ -1,0 +1,76 @@
+definitions:
+  main.ErrorResponse:
+    properties:
+      error:
+        example: invalid json
+        type: string
+    type: object
+  main.HealthResponse:
+    properties:
+      runtime:
+        example: 38271.133967079s
+        type: string
+      status:
+        example: OK
+        type: string
+    type: object
+  main.SessionCreateRequest:
+    properties:
+      session_timeout:
+        example: 7200
+        type: integer
+      ttl:
+        example: 3600
+        type: integer
+    type: object
+  main.SessionCreateResponse:
+    properties:
+      parameters:
+        $ref: '#/definitions/main.SessionCreateRequest'
+      token:
+        example: 3A9N2O
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      description: Returns service health and runtime information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+  /sessions/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new session with the given TTL and session timeout
+      parameters:
+      - description: Session create payload
+        in: body
+        name: sessionParams
+        required: true
+        schema:
+          $ref: '#/definitions/main.SessionCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SessionCreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Create a new session
+      tags:
+      - sessions
+swagger: "2.0"

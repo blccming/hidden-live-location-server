@@ -52,3 +52,8 @@ Now the project can be executed while being available via your domain.
 ```sh
 go run .
 ```
+
+When making changes to the API, document them and update swagger docs with
+```sh
+swag init
+``
