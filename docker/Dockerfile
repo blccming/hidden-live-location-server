@@ -7,7 +7,9 @@ WORKDIR /app
 # Kopiere die Go-Moduldateien und source code
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
+
+# Kopiere alle Go-Dateien in das Arbeitsverzeichnis
+COPY ../*.go ./
 
 # Baue die Go-Anwendung
 RUN go build -o mein-go-Programm
