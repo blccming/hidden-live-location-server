@@ -17,7 +17,7 @@
             - OUTPUT: OK/NOT OK -> could be done via HTTP status
     - [X] GET /health
         - OUTPUT: "OK", RUNTIME
-- [ ] document with swagger
+- [X] document with swagger
 #### storage
 - [ ] use redis to store location data for all users [TOKEN, COORDINATES, LAST_UPDATE]
 #### deployment
