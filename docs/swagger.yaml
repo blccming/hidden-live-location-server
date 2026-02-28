@@ -31,6 +31,12 @@ definitions:
         example: 3A9N2O
         type: string
     type: object
+  main.SessionTerminateRequest:
+    properties:
+      token:
+        example: 3A9N2O
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -55,7 +61,7 @@ paths:
       parameters:
       - description: Session create payload
         in: body
-        name: sessionParams
+        name: session
         required: true
         schema:
           $ref: '#/definitions/main.SessionCreateRequest'
@@ -71,6 +77,32 @@ paths:
           schema:
             $ref: '#/definitions/main.ErrorResponse'
       summary: Create a new session
+      tags:
+      - sessions
+  /sessions/terminate:
+    post:
+      consumes:
+      - application/json
+      description: Terminates an active session by its token
+      parameters:
+      - description: Session terminate payload
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/main.SessionTerminateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'successfully terminated session." TODO: fix example'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Terminate a session
       tags:
       - sessions
 swagger: "2.0"

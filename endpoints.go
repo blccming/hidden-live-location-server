@@ -75,7 +75,7 @@ type SessionCreateResponse struct {
 // @Tags         sessions
 // @Accept       json
 // @Produce      json
-// @Param        sessionParams  body      SessionCreateRequest  true  "Session create payload"
+// @Param        session  body      SessionCreateRequest  true  "Session create payload"
 // @Success      200      {object}  SessionCreateResponse
 // @Failure      400      {object}  ErrorResponse
 // @Router       /sessions/create [post]
@@ -104,6 +104,20 @@ func postSessionCreate(c *gin.Context) {
 }
 
 /* terminate */
+type SessionTerminateRequest struct {
+	Token string `json:"token" example:"3A9N2O"`
+}
+
+// postSessionTerminate godoc
+// @Summary      Terminate a session
+// @Description  Terminates an active session by its token
+// @Tags         sessions
+// @Accept       json
+// @Produce      json
+// @Param        session  body    SessionTerminateRequest  true  "Session terminate payload"
+// @Success      200              {string}  string "successfully terminated session." TODO: fix example
+// @Failure      400              {object}  ErrorResponse
+// @Router       /sessions/terminate [post]
 func postSessionTerminate(c *gin.Context) {
 	var input struct {
 		Token string `json:"token"`
@@ -115,15 +129,15 @@ func postSessionTerminate(c *gin.Context) {
 	}
 
 	if !tokenExists(input.Token) {
-		c.JSON(http.StatusBadRequest, "Session token does not exist.")
+		c.JSON(http.StatusBadRequest, "session token does not exist.")
 	}
 
 	index := sessionTokenToIndex(input.Token)
 	if index == -1 {
-		c.JSON(http.StatusBadRequest, "Error while searching for Session struct.")
+		c.JSON(http.StatusBadRequest, "error while searching for Session struct.")
 		return
 	}
 	sessions = append(sessions[:index], sessions[index+1:]...)
 
-	c.JSON(http.StatusOK, "Successfully terminated session.")
+	c.JSON(http.StatusOK, "successfully terminated session.")
 }

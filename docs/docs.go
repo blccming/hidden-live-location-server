@@ -51,7 +51,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Session create payload",
-                        "name": "sessionParams",
+                        "name": "session",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -64,6 +64,46 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/main.SessionCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sessions/terminate": {
+            "post": {
+                "description": "Terminates an active session by its token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sessions"
+                ],
+                "summary": "Terminate a session",
+                "parameters": [
+                    {
+                        "description": "Session terminate payload",
+                        "name": "session",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.SessionTerminateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successfully terminated session.\" TODO: fix example",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -118,6 +158,15 @@ const docTemplate = `{
                 "parameters": {
                     "$ref": "#/definitions/main.SessionCreateRequest"
                 },
+                "token": {
+                    "type": "string",
+                    "example": "3A9N2O"
+                }
+            }
+        },
+        "main.SessionTerminateRequest": {
+            "type": "object",
+            "properties": {
                 "token": {
                     "type": "string",
                     "example": "3A9N2O"
