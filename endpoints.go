@@ -154,7 +154,7 @@ func postSessionTerminate(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, fmt.Errorf("%e", err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("%e", err)})
 		return
 	}
 
