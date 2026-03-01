@@ -29,15 +29,21 @@ var sessions []Session
 
 func initEndpoints() *gin.Engine {
 	r := gin.Default()
+	// set middleware
+	r.Use(RateLimit(5, 5))      // limit to 5 requests per second with burst of 5
+	r.Use(MaxBodySize(1 << 10)) // max of 1 KB, biggest legitimate request should be ~ 500 bytes
 
+	// swagger config
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// our endpoints
 	r.GET("/health", getHealth)
 	r.POST("/session/create", postSessionCreate)
 	r.POST("/session/terminate", postSessionTerminate)
 	r.POST("/session/update", postSessionUpdate)
 	r.GET("/session/:token", getSession)
+
 	return r
 }
 
@@ -66,7 +72,6 @@ type HealthResponse struct {
 func getHealth(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"status": "OK", "runtime": getRuntime()})
 }
-
 
 /*
  * session create
@@ -176,9 +181,9 @@ func postSessionTerminate(c *gin.Context) {
  * session update
  */
 type SessionUpdateRequest struct {
-	Token string `json:"token" example:"3A9N2O"`
+	Token     string  `json:"token" example:"3A9N2O"`
 	Longitude float32 `json:"longitude" example:"49.026598"`
-	Latitude float32 `json:"latitude" example:"8.385259"`
+	Latitude  float32 `json:"latitude" example:"8.385259"`
 }
 
 type SessionUpdateResponse struct {
@@ -225,15 +230,14 @@ func postSessionUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-
 /*
  * get session
  */
 type SessionGetResponse struct {
-	Token       string    `json:"token" example:"3A9N2O"`
-	Longitude   float32   `json:"longitude" example:"49.026598"`
-	Latitude    float32   `json:"latitude" example:"8.385259"`
-	LastUpdate  time.Time `json:"last_update" example:"2026-03-01T13:23:45.206365244+01:00"`
+	Token      string    `json:"token" example:"3A9N2O"`
+	Longitude  float32   `json:"longitude" example:"49.026598"`
+	Latitude   float32   `json:"latitude" example:"8.385259"`
+	LastUpdate time.Time `json:"last_update" example:"2026-03-01T13:23:45.206365244+01:00"`
 }
 
 // getSession godoc
@@ -263,13 +267,13 @@ func getSession(c *gin.Context) {
 	if sessions[index].LastUpdate.IsZero() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "no location data available yet."})
 		return
-	}
+	} // TODO: after data expiration is implemented, make sure, this is still correct
 
 	resp := SessionGetResponse{
-		Token:       sessions[index].Token,
-		Longitude:   sessions[index].Longitude,
-		Latitude:    sessions[index].Latitude,
-		LastUpdate:  sessions[index].LastUpdate,
+		Token:      sessions[index].Token,
+		Longitude:  sessions[index].Longitude,
+		Latitude:   sessions[index].Latitude,
+		LastUpdate: sessions[index].LastUpdate,
 	}
 	c.JSON(http.StatusOK, resp)
 }
