@@ -8,15 +8,17 @@
   - [ ] termiante session after session timeout
 #### deployment
 - [ ] use docker containers for development / testing and deployment
+- [ ] use environment variables for log levels and port configuration
+- [ ] add github actions for CI/CD (build binary and container image)
 ### optimizations
 - [ ] "make secure"
   - [ ] use password authentication?
-- [ ] change rate limiter from global to per-client
+- [ ] add rate limiter per-client (besides the global one)
+- [ ] check directory traversal attack protection
 
 ### Notes
 - Use links to share location session => make link directly redirect to app (through some href? no idea how that works from backend / web server)
 - Would it be worth it to use Valkey instead of Redis?
-- Be aware of directory traversal attacks (could already be protected by gin, not sure about that though)
 
 ### Development
 Install docker with docker compose if not already installed.
@@ -42,4 +44,4 @@ When making changes to the API, document them and update swagger docs with
 swag init
 ```
 
-API docs are available at `/docs/index.html`.
+API docs are available at `your-host.tld/docs/index.html` (when hosting on your machine at `localhost:8080/docs/index.html`).
