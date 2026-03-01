@@ -37,6 +37,7 @@ func initEndpoints() *gin.Engine {
 	r.POST("/session/create", postSessionCreate)
 	r.POST("/session/terminate", postSessionTerminate)
 	r.POST("/session/update", postSessionUpdate)
+	r.GET("/session/:token", getSession)
 	return r
 }
 
@@ -172,7 +173,7 @@ func postSessionTerminate(c *gin.Context) {
 }
 
 /*
- * session post
+ * session update
  */
 type SessionUpdateRequest struct {
 	Token string `json:"token" example:"3A9N2O"`
@@ -212,6 +213,7 @@ func postSessionUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
 		return
 	}
+
 	sessions[index].Longitude = input.Longitude
 	sessions[index].Latitude = input.Latitude
 	sessions[index].LastUpdate = time.Now()
@@ -219,6 +221,55 @@ func postSessionUpdate(c *gin.Context) {
 	resp := SessionUpdateResponse{
 		Message: "successfully updated session.",
 		Token:   input.Token,
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+
+/*
+ * get session
+ */
+type SessionGetResponse struct {
+	Token       string    `json:"token" example:"3A9N2O"`
+	Longitude   float32   `json:"longitude" example:"49.026598"`
+	Latitude    float32   `json:"latitude" example:"8.385259"`
+	LastUpdate  time.Time `json:"last_update" example:"2026-03-01T13:23:45.206365244+01:00"`
+}
+
+// getSession godoc
+// @Summary      Retrieve a session
+// @Description  Fetches the current longitude, latitude and last‑update timestamp for a session identified by its token.
+// @Tags         session
+// @Accept       json
+// @Produce      json
+// @Param        token   path     string  true  "Session token"
+// @Success      200     {object}  SessionGetResponse "Session retrieved."
+// @Failure      400     {object}  ErrorResponse
+// @Router       /session/{token} [get]
+func getSession(c *gin.Context) {
+	token := c.Param("token")
+	fmt.Println(token)
+	if !tokenExists(token) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
+		return
+	}
+
+	index := sessionTokenToIndex(token)
+	if index == -1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
+		return
+	}
+
+	if sessions[index].LastUpdate.IsZero() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no location data available yet."})
+		return
+	}
+
+	resp := SessionGetResponse{
+		Token:       sessions[index].Token,
+		Longitude:   sessions[index].Longitude,
+		Latitude:    sessions[index].Latitude,
+		LastUpdate:  sessions[index].LastUpdate,
 	}
 	c.JSON(http.StatusOK, resp)
 }
