@@ -31,6 +31,21 @@ definitions:
         example: 3A9N2O
         type: string
     type: object
+  main.SessionGetResponse:
+    properties:
+      last_update:
+        example: "2026-03-01T13:23:45.206365244+01:00"
+        type: string
+      latitude:
+        example: 8.385259
+        type: number
+      longitude:
+        example: 49.026598
+        type: number
+      token:
+        example: 3A9N2O
+        type: string
+    type: object
   main.SessionTerminateRequest:
     properties:
       token:
@@ -83,6 +98,32 @@ paths:
       summary: Health check
       tags:
       - health
+  /session/{token}:
+    get:
+      consumes:
+      - application/json
+      description: Fetches the current longitude, latitude and last‑update timestamp
+        for a session identified by its token.
+      parameters:
+      - description: Session token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session retrieved.
+          schema:
+            $ref: '#/definitions/main.SessionGetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Retrieve a session
+      tags:
+      - session
   /session/create:
     post:
       consumes:

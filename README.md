@@ -2,17 +2,17 @@
 
 ### TODO
 #### API endpoints
-- [ ] make all planned endpoints available
-    - [ ] /session
+- [X] make all planned endpoints available
+    - [X] /session
         - [X] POST /create
             - INPUT: TTL, DURATION (automatic termination at certain timestamp)
             - OUTPUT: session token (make secure later)
         - [X] POST /terminate
             - INPUT: TOKEN
             - OUTPUT: OK/NOT OK -> could be done via HTTP status
-        - [ ] GET /sessions/update
+        - [X] GET /session/update
             - OUTPUT: STATUS (OK/NOT EXISTING/TERMINATED) -> store termination status for x amount, CORDS, LAST_UPDATED
-        - [ ] POST /session/<TOKEN>
+        - [X] POST /session/<TOKEN>
             - INPUT: CORDS
             - OUTPUT: OK/NOT OK -> could be done via HTTP status
     - [X] GET /health
@@ -26,6 +26,7 @@
 - [ ] use docker containers for development / testing and deployment
 ### optimizations
 - [ ] "make secure"
+  - [ ] use password authentication?
 
 ### Notes
 - Could use cloudflare tunnel to make testing deployment available from the internet
