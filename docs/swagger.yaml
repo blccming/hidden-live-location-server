@@ -37,6 +37,36 @@ definitions:
         example: 3A9N2O
         type: string
     type: object
+  main.SessionTerminateResponse:
+    properties:
+      message:
+        example: successfully terminated session.
+        type: string
+      token:
+        example: 3A9N2O
+        type: string
+    type: object
+  main.SessionUpdateRequest:
+    properties:
+      latitude:
+        example: 8.385259
+        type: number
+      longitude:
+        example: 49.026598
+        type: number
+      token:
+        example: 3A9N2O
+        type: string
+    type: object
+  main.SessionUpdateResponse:
+    properties:
+      message:
+        example: successfully updated session.
+        type: string
+      token:
+        example: 3A9N2O
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -53,7 +83,7 @@ paths:
       summary: Health check
       tags:
       - health
-  /sessions/create:
+  /session/create:
     post:
       consumes:
       - application/json
@@ -78,8 +108,8 @@ paths:
             $ref: '#/definitions/main.ErrorResponse'
       summary: Create a new session
       tags:
-      - sessions
-  /sessions/terminate:
+      - session
+  /session/terminate:
     post:
       consumes:
       - application/json
@@ -95,14 +125,41 @@ paths:
       - application/json
       responses:
         "200":
-          description: 'successfully terminated session." TODO: fix example'
+          description: successfully terminated session.
           schema:
-            type: string
+            $ref: '#/definitions/main.SessionTerminateResponse'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/main.ErrorResponse'
       summary: Terminate a session
       tags:
-      - sessions
+      - session
+  /session/update:
+    post:
+      consumes:
+      - application/json
+      description: Updates the location information (longitude & latitude) of an active
+        session identified by its token.
+      parameters:
+      - description: Session update payload
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/main.SessionUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session updated.
+          schema:
+            $ref: '#/definitions/main.SessionUpdateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Update a session
+      tags:
+      - session
 swagger: "2.0"
