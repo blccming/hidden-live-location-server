@@ -14,11 +14,8 @@
 - [ ] "make secure"
   - [ ] use password authentication?
 - [ ] add rate limiter per-client (besides the global one)
-- [ ] check directory traversal attack protection
-
-### Notes
-- Use links to share location session => make link directly redirect to app (through some href? no idea how that works from backend / web server)
-- Would it be worth it to use Valkey instead of Redis?
+- [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
+- [ ] Evaluate the usage of Valkey compared to Redis
 
 ### Development
 Install docker with docker compose if not already installed.
