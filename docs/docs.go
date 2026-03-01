@@ -35,7 +35,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sessions/create": {
+        "/session/create": {
             "post": {
                 "description": "Creates a new session with the given TTL and session timeout",
                 "consumes": [
@@ -45,7 +45,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sessions"
+                    "session"
                 ],
                 "summary": "Create a new session",
                 "parameters": [
@@ -75,7 +75,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sessions/terminate": {
+        "/session/terminate": {
             "post": {
                 "description": "Terminates an active session by its token",
                 "consumes": [
@@ -85,7 +85,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sessions"
+                    "session"
                 ],
                 "summary": "Terminate a session",
                 "parameters": [
@@ -101,9 +101,49 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "successfully terminated session.\" TODO: fix example",
+                        "description": "successfully terminated session.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.SessionTerminateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/session/update": {
+            "post": {
+                "description": "Updates the location information (longitude \u0026 latitude) of an active session identified by its token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "session"
+                ],
+                "summary": "Update a session",
+                "parameters": [
+                    {
+                        "description": "Session update payload",
+                        "name": "session",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.SessionUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session updated.",
+                        "schema": {
+                            "$ref": "#/definitions/main.SessionUpdateResponse"
                         }
                     },
                     "400": {
@@ -167,6 +207,49 @@ const docTemplate = `{
         "main.SessionTerminateRequest": {
             "type": "object",
             "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "3A9N2O"
+                }
+            }
+        },
+        "main.SessionTerminateResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "successfully terminated session."
+                },
+                "token": {
+                    "type": "string",
+                    "example": "3A9N2O"
+                }
+            }
+        },
+        "main.SessionUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number",
+                    "example": 8.385259
+                },
+                "longitude": {
+                    "type": "number",
+                    "example": 49.026598
+                },
+                "token": {
+                    "type": "string",
+                    "example": "3A9N2O"
+                }
+            }
+        },
+        "main.SessionUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "successfully updated session."
+                },
                 "token": {
                     "type": "string",
                     "example": "3A9N2O"

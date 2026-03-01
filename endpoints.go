@@ -30,16 +30,25 @@ var sessions []Session
 func initEndpoints() *gin.Engine {
 	r := gin.Default()
 
-	docs.SwaggerInfo.BasePath = "/docs"
+	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.GET("/health", getHealth)
 	r.POST("/session/create", postSessionCreate)
 	r.POST("/session/terminate", postSessionTerminate)
+	r.POST("/session/update", postSessionUpdate)
 	return r
 }
 
-/* health  */
+/*
+ *
+ * 	ENDPOINTS
+ *
+ */
+
+/*
+ * health check
+ */
 
 type HealthResponse struct {
 	Status  string `json:"status" example:"OK"`
@@ -57,7 +66,10 @@ func getHealth(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"status": "OK", "runtime": getRuntime()})
 }
 
-/* session create */
+
+/*
+ * session create
+ */
 
 type SessionCreateRequest struct {
 	TTL            int `json:"ttl" example:"3600"`
@@ -72,13 +84,13 @@ type SessionCreateResponse struct {
 // postSessionCreate godoc
 // @Summary      Create a new session
 // @Description  Creates a new session with the given TTL and session timeout
-// @Tags         sessions
+// @Tags         session
 // @Accept       json
 // @Produce      json
 // @Param        session  body      SessionCreateRequest  true  "Session create payload"
 // @Success      200      {object}  SessionCreateResponse
 // @Failure      400      {object}  ErrorResponse
-// @Router       /sessions/create [post]
+// @Router       /session/create [post]
 func postSessionCreate(c *gin.Context) {
 	var newSession Session
 	input := SessionCreateRequest{TTL: -1, SessionTimeout: -1}
@@ -89,7 +101,8 @@ func postSessionCreate(c *gin.Context) {
 	}
 
 	if input.TTL <= 0 || input.SessionTimeout <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error:": "ttl and session_timeout must be set and > 0"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ttl and session_timeout must be set and > 0"})
+		return
 	}
 
 	newSession.Token = tokenCreate()
@@ -98,26 +111,37 @@ func postSessionCreate(c *gin.Context) {
 
 	// TODO: dont directly modify sessions[] -> no need to fix, will switch to redis later
 	sessions = append(sessions, newSession)
+	fmt.Println(newSession) // TODO: remove in production?
 
-	fmt.Println(newSession)
-	c.JSON(http.StatusOK, gin.H{"token": newSession.Token})
+	resp := SessionCreateResponse{
+		Token:  newSession.Token,
+		Params: input,
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
-/* terminate */
+/*
+ * session terminate
+ */
 type SessionTerminateRequest struct {
 	Token string `json:"token" example:"3A9N2O"`
+}
+
+type SessionTerminateResponse struct {
+	Message string `json:"message" example:"successfully terminated session."`
+	Token   string `json:"token" example:"3A9N2O"`
 }
 
 // postSessionTerminate godoc
 // @Summary      Terminate a session
 // @Description  Terminates an active session by its token
-// @Tags         sessions
+// @Tags         session
 // @Accept       json
 // @Produce      json
 // @Param        session  body    SessionTerminateRequest  true  "Session terminate payload"
-// @Success      200              {string}  string "successfully terminated session." TODO: fix example
+// @Success      200              {object}  SessionTerminateResponse "successfully terminated session."
 // @Failure      400              {object}  ErrorResponse
-// @Router       /sessions/terminate [post]
+// @Router       /session/terminate [post]
 func postSessionTerminate(c *gin.Context) {
 	var input struct {
 		Token string `json:"token"`
@@ -129,15 +153,72 @@ func postSessionTerminate(c *gin.Context) {
 	}
 
 	if !tokenExists(input.Token) {
-		c.JSON(http.StatusBadRequest, "session token does not exist.")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
+		return
 	}
 
 	index := sessionTokenToIndex(input.Token)
 	if index == -1 {
-		c.JSON(http.StatusBadRequest, "error while searching for Session struct.")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
 		return
 	}
 	sessions = append(sessions[:index], sessions[index+1:]...)
 
-	c.JSON(http.StatusOK, "successfully terminated session.")
+	resp := SessionTerminateResponse{
+		Message: "successfully terminated session.",
+		Token:   input.Token,
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+/*
+ * session post
+ */
+type SessionUpdateRequest struct {
+	Token string `json:"token" example:"3A9N2O"`
+	Longitude float32 `json:"longitude" example:"49.026598"`
+	Latitude float32 `json:"latitude" example:"8.385259"`
+}
+
+type SessionUpdateResponse struct {
+	Message string `json:"message" example:"successfully updated session."`
+	Token   string `json:"token" example:"3A9N2O"`
+}
+
+// postSessionUpdate godoc
+// @Summary      Update a session
+// @Description  Updates the location information (longitude & latitude) of an active session identified by its token.
+// @Tags         session
+// @Accept       json
+// @Produce      json
+// @Param        session  body    SessionUpdateRequest  true  "Session update payload"
+// @Success      200      {object} SessionUpdateResponse "Session updated."
+// @Failure      400      {object} ErrorResponse
+// @Router       /session/update [post]
+func postSessionUpdate(c *gin.Context) {
+	var input SessionUpdateRequest
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("%e", err)})
+		return
+	}
+
+	if !tokenExists(input.Token) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
+		return
+	}
+
+	index := sessionTokenToIndex(input.Token)
+	if index == -1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
+		return
+	}
+	sessions[index].Longitude = input.Longitude
+	sessions[index].Latitude = input.Latitude
+	sessions[index].LastUpdate = time.Now()
+
+	resp := SessionUpdateResponse{
+		Message: "successfully updated session.",
+		Token:   input.Token,
+	}
+	c.JSON(http.StatusOK, resp)
 }

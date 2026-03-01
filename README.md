@@ -10,7 +10,7 @@
         - [X] POST /terminate
             - INPUT: TOKEN
             - OUTPUT: OK/NOT OK -> could be done via HTTP status
-        - [ ] GET /session/<TOKEN>
+        - [ ] GET /sessions/update
             - OUTPUT: STATUS (OK/NOT EXISTING/TERMINATED) -> store termination status for x amount, CORDS, LAST_UPDATED
         - [ ] POST /session/<TOKEN>
             - INPUT: CORDS
@@ -20,6 +20,8 @@
 - [X] document with swagger
 #### storage
 - [ ] use redis to store location data for all users [TOKEN, COORDINATES, LAST_UPDATE]
+- [ ] delete data after TTL timeout
+- [ ] termiante session after session timeout
 #### deployment
 - [ ] use docker containers for development / testing and deployment
 ### optimizations
