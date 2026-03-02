@@ -8,7 +8,26 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func RateLimit(perSec int, maxReq int) gin.HandlerFunc {
+var clientLimiters = make(map[string]*rate.Limiter)
+
+func PerClientRateLimit(perSec int, maxReq int) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ip := c.ClientIP()
+
+		if _, exists := clientLimiters[ip]; !exists {
+			clientLimiters[ip] = rate.NewLimiter(rate.Limit(perSec), maxReq)
+		}
+
+		if !clientLimiters[ip].Allow() {
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
+			log.Warn().Msgf("Client rate limit exceeded: %s, %d req/s, max %d req", ip, perSec, maxReq)
+			return
+		}
+		c.Next()
+	}
+}
+
+func GlobalRateLimit(perSec int, maxReq int) gin.HandlerFunc {
 	var limiter = rate.NewLimiter(rate.Limit(perSec), maxReq)
 
 	return func(c *gin.Context) {
