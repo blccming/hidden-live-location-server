@@ -3,7 +3,6 @@ package configuration
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -11,26 +10,20 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 )
 
-// TODO: set zerolog level
-
 const (
 	DefaultPort     = "8080"
 	DefaultHost     = "0.0.0.0"
 	DefaultLogLevel = "DEBUG"
 )
 
-type config struct {
-	port     string
-	host     string
-	logLevel string
-}
+func initializeZerolog(loglevel zerolog.Level) {
+	zerolog.SetGlobalLevel(loglevel)
 
-func initializeZerolog() {
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,
-		TimeFormat: time.RFC3339,
+		TimeFormat: "2006/01/02 - 15:04:05",
 	})
 
 	log.Debug().Msgf("Configured Zerolog.")
@@ -38,25 +31,25 @@ func initializeZerolog() {
 
 func Configure() string {
 	// Initialize zerolog before first use
-	initializeZerolog()
+	loglevel := getEnvLogLevel(DefaultLogLevel)
+	initializeZerolog(logLevels[loglevel])
 
-	c := config{
-		port:     getEnvPort(DefaultPort),
-		host:     getEnvHost(DefaultHost),
-		logLevel: getEnvLogLevel(DefaultLogLevel),
+	if loglevel != DefaultLogLevel {
+		log.Info().Msgf("Changed default log level due to env var: %s", loglevel)
+	} else {
+		log.Debug().Msgf("Using default log level: %s", loglevel)
 	}
 
 	// Set gin mode to release if log level is not DEBUG
-	if c.logLevel != "DEBUG" && c.logLevel != "TRACE" {
+	if loglevel != "DEBUG" && loglevel != "TRACE" {
 		gin.SetMode(gin.ReleaseMode)
-		log.Info().Msgf("Set gin mode to release due to log level: %s", c.logLevel)
+		log.Info().Msgf("Set gin mode to release due to log level: %s", loglevel)
 	} else {
-		log.Debug().Msgf("Left gin mode at debug due to log level: %s", c.logLevel)
+		log.Debug().Msgf("Left gin mode at debug due to log level: %s", loglevel)
 	}
 
-	// Configure zerolog
-	zerolog.SetGlobalLevel(logLevels[c.logLevel])
-
-	// Run the gin server
-	return fmt.Sprintf("%s:%s", c.host, c.port)
+	// Get port and host from environment variables or use defaults and return the address
+	port := getEnvPort(DefaultPort)
+	host := getEnvHost(DefaultHost)
+	return fmt.Sprintf("%s:%s", host, port)
 }

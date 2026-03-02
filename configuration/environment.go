@@ -22,12 +22,10 @@ var logLevels = map[string]zerolog.Level{
 func getEnvLogLevel(defaultValue string) string {
 	logLevel := os.Getenv("LOGLEVEL")
 	if level, exists := logLevels[logLevel]; exists {
-		if level != zerolog.NoLevel {
-			log.Info().Msgf("Changed default log level due to env var: %s", logLevel)
+		if level != logLevels[defaultValue] {
 			return logLevel
 		}
 	}
-	log.Info().Msgf("Using default log level: %s", defaultValue)
 	return defaultValue
 }
 
@@ -38,7 +36,7 @@ func getEnvPort(defaultValue string) string {
 			return port
 		}
 	}
-	log.Info().Msgf("Using default port: %s", defaultValue)
+	log.Info().Msgf("Using default port (might be due to port env var being out of range: 1024-65535): %s", defaultValue)
 	return defaultValue
 }
 

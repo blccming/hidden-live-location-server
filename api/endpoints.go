@@ -121,7 +121,6 @@ func postSessionCreate(c *gin.Context) {
 
 	// TODO: dont directly modify sessions[] -> no need to fix, will switch to redis later
 	sessions = append(sessions, newSession)
-	fmt.Println(newSession) // TODO: remove in production?
 
 	resp := SessionCreateResponse{
 		Token:  newSession.Token,
