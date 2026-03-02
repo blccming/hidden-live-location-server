@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"github.com/blccming/private-positioning-server/api"
 )
 
 func main() {
-	fmt.Println("test")
-	r := initEndpoints()
+	r := api.InitEndpoints()
 	r.Run("localhost:8080")
 }

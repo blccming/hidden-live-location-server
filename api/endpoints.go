@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ type ErrorResponse struct {
 
 var sessions []Session
 
-func initEndpoints() *gin.Engine {
+func InitEndpoints() *gin.Engine {
 	r := gin.Default()
 	// set middleware
 	r.Use(RateLimit(5, 5))      // limit to 5 requests per second with burst of 5
