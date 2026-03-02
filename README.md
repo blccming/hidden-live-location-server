@@ -14,7 +14,7 @@
 - [ ] "make secure"
   - [ ] use password authentication?
 - [ ] **add rate limiter per-client (besides the global one)**
-- [ ] **add proper logging (with zerolog?)**
+- [X] add proper logging (with zerolog?)
 - [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
 - [ ] Evaluate the usage of Valkey compared to Redis

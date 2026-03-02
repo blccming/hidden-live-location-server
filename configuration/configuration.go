@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/pkgerrors"
 )
 
 // TODO: set zerolog level
@@ -24,16 +25,21 @@ type config struct {
 	logLevel string
 }
 
-func configureZerolog(level zerolog.Level) {
-	zerolog.SetGlobalLevel(level)
+func initializeZerolog() {
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: time.RFC3339,
 	})
+
+	log.Debug().Msgf("Configured Zerolog.")
 }
 
 func Configure() string {
+	// Initialize zerolog before first use
+	initializeZerolog()
+
 	c := config{
 		port:     getEnvPort(DefaultPort),
 		host:     getEnvHost(DefaultHost),
@@ -43,10 +49,13 @@ func Configure() string {
 	// Set gin mode to release if log level is not DEBUG
 	if c.logLevel != "DEBUG" && c.logLevel != "TRACE" {
 		gin.SetMode(gin.ReleaseMode)
+		log.Info().Msgf("Set gin mode to release due to log level: %s", c.logLevel)
+	} else {
+		log.Debug().Msgf("Left gin mode at debug due to log level: %s", c.logLevel)
 	}
 
 	// Configure zerolog
-	configureZerolog(logLevels[c.logLevel])
+	zerolog.SetGlobalLevel(logLevels[c.logLevel])
 
 	// Run the gin server
 	return fmt.Sprintf("%s:%s", c.host, c.port)
