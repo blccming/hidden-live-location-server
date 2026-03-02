@@ -28,15 +28,16 @@ type ErrorResponse struct {
 
 var sessions []Session
 
-func InitEndpoints() *gin.Engine {
+func InitEndpoints(useSwagger bool) *gin.Engine {
 	r := gin.Default()
-	// set middleware, TODO: exclude /docs (swagger)
-	// r.Use(RateLimit(5, 5))      // limit to 5 requests per second with burst of 5
-	// r.Use(MaxBodySize(1 << 10)) // max of 1 KB, biggest legitimate request should be ~ 500 bytes
+	r.Use(RateLimit(200, 5))    // limit to 200 requests per second with burst of 5
+	r.Use(MaxBodySize(1 << 10)) // max of 1 KB, biggest legitimate request should be ~ 500 bytes
 
 	// swagger config
-	docs.SwaggerInfo.BasePath = "/"
-	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	if useSwagger {
+		docs.SwaggerInfo.BasePath = "/"
+		r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// our endpoints
 	r.GET("/health", getHealth)

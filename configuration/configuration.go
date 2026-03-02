@@ -29,7 +29,7 @@ func initializeZerolog(loglevel zerolog.Level) {
 	log.Debug().Msgf("Configured Zerolog.")
 }
 
-func Configure() string {
+func Configure() (ginAddress string, debugMode bool) {
 	// Initialize zerolog before first use
 	loglevel := getEnvLogLevel(DefaultLogLevel)
 	initializeZerolog(logLevels[loglevel])
@@ -51,5 +51,5 @@ func Configure() string {
 	// Get port and host from environment variables or use defaults and return the address
 	port := getEnvPort(DefaultPort)
 	host := getEnvHost(DefaultHost)
-	return fmt.Sprintf("%s:%s", host, port)
+	return fmt.Sprintf("%s:%s", host, port), (loglevel == "DEBUG" || loglevel == "TRACE")
 }
