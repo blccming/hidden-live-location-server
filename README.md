@@ -8,7 +8,7 @@
   - [ ] termiante session after session timeout
 #### deployment
 - [ ] use docker containers for development / testing and deployment
-- [ ] **use environment variables for log levels and port configuration**
+- [X] use environment variables for log levels and host/port configuration
 - [ ] add github actions for CI/CD (build binary and container image)
 ### optimizations
 - [ ] "make secure"
@@ -29,7 +29,7 @@ Configure your Cloudflare Zero Trust Token in `docker/.env` and start the contai
 ```sh
 cd docker
 mv .env.example .env
-nano .env
+nano .env # replace placeholder with your token
 docker compose up -d
 ```
 
@@ -38,7 +38,7 @@ Now the project can be executed while being available via your domain.
 go run .
 ```
 
-When making changes to the API, document them and update swagger docs with
+When making changes to the API, document them and update swagger docs (make sure `swag` is in PATH) with
 ```sh
 swag init
 ```
