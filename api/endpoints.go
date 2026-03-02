@@ -8,6 +8,7 @@ import (
 	"github.com/blccming/private-positioning-server/docs"
 	_ "github.com/blccming/private-positioning-server/docs"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -29,9 +30,9 @@ var sessions []Session
 
 func InitEndpoints() *gin.Engine {
 	r := gin.Default()
-	// set middleware
-	r.Use(RateLimit(5, 5))      // limit to 5 requests per second with burst of 5
-	r.Use(MaxBodySize(1 << 10)) // max of 1 KB, biggest legitimate request should be ~ 500 bytes
+	// set middleware, TODO: exclude /docs (swagger)
+	// r.Use(RateLimit(5, 5))      // limit to 5 requests per second with burst of 5
+	// r.Use(MaxBodySize(1 << 10)) // max of 1 KB, biggest legitimate request should be ~ 500 bytes
 
 	// swagger config
 	docs.SwaggerInfo.BasePath = "/"
@@ -43,6 +44,7 @@ func InitEndpoints() *gin.Engine {
 	r.POST("/session/terminate", postSessionTerminate)
 	r.POST("/session/update", postSessionUpdate)
 	r.GET("/session/:token", getSession)
+	log.Info().Msg("Finalized Gin initialization.")
 
 	return r
 }
@@ -103,11 +105,13 @@ func postSessionCreate(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
+		log.Error().Stack().Err(err).Msg("Failed to bind session create request")
 		return
 	}
 
 	if input.TTL <= 0 || input.SessionTimeout <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ttl and session_timeout must be set and > 0"})
+		log.Error().Msgf("Invalid TTL or session_timeout: ttl=%d, session_timeout=%d", input.TTL, input.SessionTimeout)
 		return
 	}
 
@@ -124,6 +128,7 @@ func postSessionCreate(c *gin.Context) {
 		Params: input,
 	}
 	c.JSON(http.StatusOK, resp)
+	log.Info().Msgf("Session created: %s", newSession.Token)
 }
 
 /*
@@ -155,17 +160,20 @@ func postSessionTerminate(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("%e", err)})
+		log.Error().Stack().Err(err).Msgf("Failed to bind session terminate request: %s", input.Token)
 		return
 	}
 
 	if !tokenExists(input.Token) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
+		log.Error().Msgf("Session token does not exist: %s", input.Token)
 		return
 	}
 
 	index := sessionTokenToIndex(input.Token)
 	if index == -1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
+		log.Error().Msgf("Error while searching for session struct via Token: %s", input.Token)
 		return
 	}
 	sessions = append(sessions[:index], sessions[index+1:]...)
@@ -175,6 +183,7 @@ func postSessionTerminate(c *gin.Context) {
 		Token:   input.Token,
 	}
 	c.JSON(http.StatusOK, resp)
+	log.Info().Msgf("Session terminated: %s", input.Token)
 }
 
 /*
@@ -205,17 +214,20 @@ func postSessionUpdate(c *gin.Context) {
 	var input SessionUpdateRequest
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("%e", err)})
+		log.Error().Stack().Err(err).Msgf("Error while binding JSON")
 		return
 	}
 
 	if !tokenExists(input.Token) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
+		log.Error().Msgf("Session token does not exist: %s", input.Token)
 		return
 	}
 
 	index := sessionTokenToIndex(input.Token)
 	if index == -1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
+		log.Error().Msgf("Error while searching for session struct via Token: %s", input.Token)
 		return
 	}
 
@@ -228,6 +240,8 @@ func postSessionUpdate(c *gin.Context) {
 		Token:   input.Token,
 	}
 	c.JSON(http.StatusOK, resp)
+
+	log.Info().Msgf("Session updated: %s", input.Token)
 }
 
 /*
@@ -252,20 +266,23 @@ type SessionGetResponse struct {
 // @Router       /session/{token} [get]
 func getSession(c *gin.Context) {
 	token := c.Param("token")
-	fmt.Println(token)
+
 	if !tokenExists(token) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
+		log.Error().Msgf("Session token does not exist: %s", token)
 		return
 	}
 
 	index := sessionTokenToIndex(token)
 	if index == -1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
+		log.Error().Msgf("Error while searching for session struct via Token: %s", token)
 		return
 	}
 
 	if sessions[index].LastUpdate.IsZero() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "no location data available yet."})
+		log.Error().Msgf("No location data available for session: %s", token)
 		return
 	} // TODO: after data expiration is implemented, make sure, this is still correct
 
@@ -276,4 +293,6 @@ func getSession(c *gin.Context) {
 		LastUpdate: sessions[index].LastUpdate,
 	}
 	c.JSON(http.StatusOK, resp)
+
+	log.Info().Msgf("Session retrieved: %s", token)
 }
