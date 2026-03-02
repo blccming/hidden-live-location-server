@@ -17,7 +17,6 @@
 - [X] add proper logging (with zerolog?)
 - [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
-- [ ] Repair Gin middleware according to TODO written in respective file
 - [ ] Evaluate the usage of Valkey compared to Redis
 
 ### Development

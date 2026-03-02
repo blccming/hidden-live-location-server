@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	ginCfg := configuration.Configure()
+	ginCfg, debugMode := configuration.Configure()
 
-	r := api.InitEndpoints()
+	r := api.InitEndpoints(debugMode) // Use swagger if debugMode (logLevel is DEBUG or TRACE)
 	log.Info().Msgf("Server starting on %s.", ginCfg)
 	r.Run(ginCfg)
 }

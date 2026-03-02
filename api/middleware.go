@@ -24,7 +24,6 @@ func RateLimit(perSec int, maxReq int) gin.HandlerFunc {
 func MaxBodySize(max int64) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, max)
-		log.Warn().Msgf("Max body size exceeded: %d bytes", max)
 		c.Next()
 	}
 }
