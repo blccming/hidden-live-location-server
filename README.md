@@ -5,7 +5,7 @@
 - [ ] use redis to store location data for all users [TOKEN, LONGITUDE, LATIDUDE, TTL, TIMEOUT, LAST_UPDATE (, PW-HASH?)]
 - [ ] coroutine logic
   - [ ] delete data of session after TTL timeout
-  - [ ] termiante session after session timeout
+  - [ ] terminate session after session timeout
 #### deployment
 - [ ] use docker containers for development / testing and deployment
 - [X] use environment variables for log levels and host/port configuration
@@ -17,6 +17,7 @@
 - [X] add proper logging (with zerolog?)
 - [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
+- [ ] Repair Gin middleware according to TODO written in respective file
 - [ ] Evaluate the usage of Valkey compared to Redis
 
 ### Development
