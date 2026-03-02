@@ -1,7 +1,21 @@
 ---
 services:
   cloudflared:
+    container_name: cloudflared
     image: cloudflare/cloudflared:latest
-    restart: unless-stopped
+    restart: on-failure
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     network_mode: host # VERY VERY TEMPORARY, REMOVE ASAP
+
+  valkey:
+    container_name: valkey
+    image: valkey/valkey:9
+    restart: on-failure
+    volumes:
+      - valkey-data:/data
+    command: valkey-server --requirepass ${VALKEY_PASSWORD}
+    ports:
+      - "6379:6379"
+
+volumes:
+  valkey-data:

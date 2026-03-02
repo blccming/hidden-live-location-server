@@ -1,6 +1,6 @@
 module github.com/blccming/private-positioning-server
 
-go 1.24.0
+go 1.24.9
 
 toolchain go1.24.13
 
@@ -10,6 +10,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
+	github.com/valkey-io/valkey-go v1.0.72
 	golang.org/x/time v0.14.0
 )
 
@@ -38,7 +39,6 @@ require (
 	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
