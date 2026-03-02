@@ -2,9 +2,9 @@
 
 ### TODO
 #### storage
-- [ ] use redis to store location data for all users [TOKEN, LONGITUDE, LATIDUDE, TTL, TIMEOUT, LAST_UPDATE (, PW-HASH?)]
-- [ ] coroutine logic
-  - [ ] delete data of session after TTL timeout
+- [ ] **use valkey to store location data for all users**
+- [ ] **expiration logic in valkey**
+  - [ ] delete location data of session after TTL timeout (different namespace from session data)
   - [ ] terminate session after session timeout
 #### deployment
 - [ ] use docker containers for development / testing and deployment
@@ -17,7 +17,7 @@
 - [X] add proper logging (with zerolog?)
 - [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
-- [ ] Evaluate the usage of Valkey compared to Redis
+- [X] Evaluate the usage of Valkey compared to Redis => use Valkey for location data storage
 
 ### Development
 Install docker with docker compose if not already installed.
