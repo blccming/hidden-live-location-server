@@ -2,18 +2,20 @@
 
 ### TODO
 #### storage
-- [ ] use redis to store location data for all users [TOKEN, COORDINATES, LAST_UPDATE]
+- [ ] use redis to store location data for all users [TOKEN, LONGITUDE, LATIDUDE, TTL, TIMEOUT, LAST_UPDATE (, PW-HASH?)]
 - [ ] coroutine logic
   - [ ] delete data of session after TTL timeout
   - [ ] termiante session after session timeout
 #### deployment
 - [ ] use docker containers for development / testing and deployment
-- [ ] use environment variables for log levels and port configuration
+- [ ] **use environment variables for log levels and port configuration**
 - [ ] add github actions for CI/CD (build binary and container image)
 ### optimizations
 - [ ] "make secure"
   - [ ] use password authentication?
-- [ ] add rate limiter per-client (besides the global one)
+- [ ] **add rate limiter per-client (besides the global one)**
+- [ ] **add proper logging (with zerolog?)**
+- [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
 - [ ] Evaluate the usage of Valkey compared to Redis
 
