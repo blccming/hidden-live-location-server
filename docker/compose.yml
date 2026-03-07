@@ -11,7 +11,7 @@ services:
       - "6379:6379"
 
   pps:
-    container_name: positioning-server
+    container_name: hll-server
     build:
       context: ..
       dockerfile: docker/Dockerfile

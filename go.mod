@@ -1,4 +1,4 @@
-module github.com/blccming/private-positioning-server
+module github.com/blccming/hidden-live-location-server
 
 go 1.24.0
 

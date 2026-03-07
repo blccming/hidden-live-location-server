@@ -13,7 +13,7 @@ COPY . .
 
 # Build the Go application (main.go is in the project root)
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-RUN go build -o pps .
+RUN go build -o hidden-live-location-server .
 
 # Runtime image
 FROM alpine:latest
@@ -21,8 +21,8 @@ FROM alpine:latest
 WORKDIR /app
 
 # Copy the built Go binary
-COPY --from=builder /app/pps .
+COPY --from=builder /app/hidden-live-location-server .
 
 EXPOSE 8080
 
-CMD ["./pps"]
+CMD ["./hidden-live-location-server"]

@@ -18,7 +18,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.HealthResponse"
+                            "$ref": "#/definitions/api.HealthResponse"
                         }
                     }
                 }
@@ -44,7 +44,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.SessionCreateRequest"
+                            "$ref": "#/definitions/api.SessionCreateRequest"
                         }
                     }
                 ],
@@ -52,13 +52,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionCreateResponse"
+                            "$ref": "#/definitions/api.SessionCreateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -84,7 +84,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.SessionTerminateRequest"
+                            "$ref": "#/definitions/api.SessionTerminateRequest"
                         }
                     }
                 ],
@@ -92,13 +92,13 @@
                     "200": {
                         "description": "successfully terminated session.",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionTerminateResponse"
+                            "$ref": "#/definitions/api.SessionTerminateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -124,7 +124,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.SessionUpdateRequest"
+                            "$ref": "#/definitions/api.SessionUpdateRequest"
                         }
                     }
                 ],
@@ -132,13 +132,13 @@
                     "200": {
                         "description": "Session updated.",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionUpdateResponse"
+                            "$ref": "#/definitions/api.SessionUpdateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -170,13 +170,13 @@
                     "200": {
                         "description": "Session retrieved.",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionGetResponse"
+                            "$ref": "#/definitions/api.SessionGetResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -184,7 +184,7 @@
         }
     },
     "definitions": {
-        "main.ErrorResponse": {
+        "api.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -193,7 +193,7 @@
                 }
             }
         },
-        "main.HealthResponse": {
+        "api.HealthResponse": {
             "type": "object",
             "properties": {
                 "runtime": {
@@ -206,7 +206,7 @@
                 }
             }
         },
-        "main.SessionCreateRequest": {
+        "api.SessionCreateRequest": {
             "type": "object",
             "properties": {
                 "session_timeout": {
@@ -219,11 +219,11 @@
                 }
             }
         },
-        "main.SessionCreateResponse": {
+        "api.SessionCreateResponse": {
             "type": "object",
             "properties": {
                 "parameters": {
-                    "$ref": "#/definitions/main.SessionCreateRequest"
+                    "$ref": "#/definitions/api.SessionCreateRequest"
                 },
                 "token": {
                     "type": "string",
@@ -231,7 +231,7 @@
                 }
             }
         },
-        "main.SessionGetResponse": {
+        "api.SessionGetResponse": {
             "type": "object",
             "properties": {
                 "last_update": {
@@ -252,7 +252,7 @@
                 }
             }
         },
-        "main.SessionTerminateRequest": {
+        "api.SessionTerminateRequest": {
             "type": "object",
             "properties": {
                 "token": {
@@ -261,7 +261,7 @@
                 }
             }
         },
-        "main.SessionTerminateResponse": {
+        "api.SessionTerminateResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -274,7 +274,7 @@
                 }
             }
         },
-        "main.SessionUpdateRequest": {
+        "api.SessionUpdateRequest": {
             "type": "object",
             "properties": {
                 "latitude": {
@@ -291,7 +291,7 @@
                 }
             }
         },
-        "main.SessionUpdateResponse": {
+        "api.SessionUpdateResponse": {
             "type": "object",
             "properties": {
                 "message": {

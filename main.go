@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/blccming/private-positioning-server/api"
-	"github.com/blccming/private-positioning-server/configuration"
+	"github.com/blccming/hidden-live-location-server/api"
+	"github.com/blccming/hidden-live-location-server/configuration"
 	"github.com/rs/zerolog/log"
 )
 

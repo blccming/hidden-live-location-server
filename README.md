@@ -1,4 +1,4 @@
-## private positioning server
+## hidden live location server
 
 ### TODO
 #### storage

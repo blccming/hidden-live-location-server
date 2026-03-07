@@ -29,7 +29,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.HealthResponse"
+                            "$ref": "#/definitions/api.HealthResponse"
                         }
                     }
                 }
@@ -55,7 +55,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.SessionCreateRequest"
+                            "$ref": "#/definitions/api.SessionCreateRequest"
                         }
                     }
                 ],
@@ -63,13 +63,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionCreateResponse"
+                            "$ref": "#/definitions/api.SessionCreateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -95,7 +95,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.SessionTerminateRequest"
+                            "$ref": "#/definitions/api.SessionTerminateRequest"
                         }
                     }
                 ],
@@ -103,13 +103,13 @@ const docTemplate = `{
                     "200": {
                         "description": "successfully terminated session.",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionTerminateResponse"
+                            "$ref": "#/definitions/api.SessionTerminateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -135,7 +135,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.SessionUpdateRequest"
+                            "$ref": "#/definitions/api.SessionUpdateRequest"
                         }
                     }
                 ],
@@ -143,13 +143,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Session updated.",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionUpdateResponse"
+                            "$ref": "#/definitions/api.SessionUpdateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -181,13 +181,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Session retrieved.",
                         "schema": {
-                            "$ref": "#/definitions/main.SessionGetResponse"
+                            "$ref": "#/definitions/api.SessionGetResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -195,7 +195,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.ErrorResponse": {
+        "api.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -204,7 +204,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.HealthResponse": {
+        "api.HealthResponse": {
             "type": "object",
             "properties": {
                 "runtime": {
@@ -217,7 +217,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionCreateRequest": {
+        "api.SessionCreateRequest": {
             "type": "object",
             "properties": {
                 "session_timeout": {
@@ -230,11 +230,11 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionCreateResponse": {
+        "api.SessionCreateResponse": {
             "type": "object",
             "properties": {
                 "parameters": {
-                    "$ref": "#/definitions/main.SessionCreateRequest"
+                    "$ref": "#/definitions/api.SessionCreateRequest"
                 },
                 "token": {
                     "type": "string",
@@ -242,7 +242,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionGetResponse": {
+        "api.SessionGetResponse": {
             "type": "object",
             "properties": {
                 "last_update": {
@@ -263,7 +263,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionTerminateRequest": {
+        "api.SessionTerminateRequest": {
             "type": "object",
             "properties": {
                 "token": {
@@ -272,7 +272,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionTerminateResponse": {
+        "api.SessionTerminateResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -285,7 +285,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionUpdateRequest": {
+        "api.SessionUpdateRequest": {
             "type": "object",
             "properties": {
                 "latitude": {
@@ -302,7 +302,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.SessionUpdateResponse": {
+        "api.SessionUpdateResponse": {
             "type": "object",
             "properties": {
                 "message": {

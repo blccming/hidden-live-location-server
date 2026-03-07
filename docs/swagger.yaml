@@ -1,11 +1,11 @@
 definitions:
-  main.ErrorResponse:
+  api.ErrorResponse:
     properties:
       error:
         example: invalid json
         type: string
     type: object
-  main.HealthResponse:
+  api.HealthResponse:
     properties:
       runtime:
         example: 38271.133967079s
@@ -14,7 +14,7 @@ definitions:
         example: OK
         type: string
     type: object
-  main.SessionCreateRequest:
+  api.SessionCreateRequest:
     properties:
       session_timeout:
         example: 7200
@@ -23,15 +23,15 @@ definitions:
         example: 3600
         type: integer
     type: object
-  main.SessionCreateResponse:
+  api.SessionCreateResponse:
     properties:
       parameters:
-        $ref: '#/definitions/main.SessionCreateRequest'
+        $ref: '#/definitions/api.SessionCreateRequest'
       token:
         example: 3A9N2O
         type: string
     type: object
-  main.SessionGetResponse:
+  api.SessionGetResponse:
     properties:
       last_update:
         example: "2026-03-01T13:23:45.206365244+01:00"
@@ -46,13 +46,13 @@ definitions:
         example: 3A9N2O
         type: string
     type: object
-  main.SessionTerminateRequest:
+  api.SessionTerminateRequest:
     properties:
       token:
         example: 3A9N2O
         type: string
     type: object
-  main.SessionTerminateResponse:
+  api.SessionTerminateResponse:
     properties:
       message:
         example: successfully terminated session.
@@ -61,7 +61,7 @@ definitions:
         example: 3A9N2O
         type: string
     type: object
-  main.SessionUpdateRequest:
+  api.SessionUpdateRequest:
     properties:
       latitude:
         example: 8.385259
@@ -73,7 +73,7 @@ definitions:
         example: 3A9N2O
         type: string
     type: object
-  main.SessionUpdateResponse:
+  api.SessionUpdateResponse:
     properties:
       message:
         example: successfully updated session.
@@ -94,7 +94,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.HealthResponse'
+            $ref: '#/definitions/api.HealthResponse'
       summary: Health check
       tags:
       - health
@@ -116,11 +116,11 @@ paths:
         "200":
           description: Session retrieved.
           schema:
-            $ref: '#/definitions/main.SessionGetResponse'
+            $ref: '#/definitions/api.SessionGetResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Retrieve a session
       tags:
       - session
@@ -135,18 +135,18 @@ paths:
         name: session
         required: true
         schema:
-          $ref: '#/definitions/main.SessionCreateRequest'
+          $ref: '#/definitions/api.SessionCreateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.SessionCreateResponse'
+            $ref: '#/definitions/api.SessionCreateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Create a new session
       tags:
       - session
@@ -161,18 +161,18 @@ paths:
         name: session
         required: true
         schema:
-          $ref: '#/definitions/main.SessionTerminateRequest'
+          $ref: '#/definitions/api.SessionTerminateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: successfully terminated session.
           schema:
-            $ref: '#/definitions/main.SessionTerminateResponse'
+            $ref: '#/definitions/api.SessionTerminateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Terminate a session
       tags:
       - session
@@ -188,18 +188,18 @@ paths:
         name: session
         required: true
         schema:
-          $ref: '#/definitions/main.SessionUpdateRequest'
+          $ref: '#/definitions/api.SessionUpdateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Session updated.
           schema:
-            $ref: '#/definitions/main.SessionUpdateResponse'
+            $ref: '#/definitions/api.SessionUpdateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Update a session
       tags:
       - session
