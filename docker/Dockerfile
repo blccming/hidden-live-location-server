@@ -1,30 +1,28 @@
-# Basis-Image für Go
+# Base image for Go
 FROM golang:1.24 AS builder
 
-# Arbeitsverzeichnis im Container
+# Working directory inside the container
 WORKDIR /app
 
-# Kopiere die Go-Moduldateien und source code
-COPY ../go.mod ../go.sum ./
+# Copy the Go module files
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Kopiere alle Go-Dateien in das Arbeitsverzeichnis
-COPY ../*.go ./
+# Copy the rest of the source code
+COPY . .
 
-# Baue die Go-Anwendung
-RUN go build -o pps
+# Build the Go application (main.go is in the project root)
+ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+RUN go build -o pps .
 
-# Laufzeit-Image
+# Runtime image
 FROM alpine:latest
 
-# Arbeitsverzeichnis im Container
 WORKDIR /app
 
-# Kopiere das gebaute Go-Programm
+# Copy the built Go binary
 COPY --from=builder /app/pps .
 
-# Exponiere den Port, auf dem die App läuft
 EXPOSE 8080
 
-# Starte die Go-Anwendung
 CMD ["./pps"]

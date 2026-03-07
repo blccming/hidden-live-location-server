@@ -11,7 +11,10 @@ services:
       - "6379:6379"
 
   pps:
-    build: .
+    container_name: positioning-server
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     restart: always
     ports:
       - "8080:8080"
