@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/blccming/private-positioning-server/docs"
-	_ "github.com/blccming/private-positioning-server/docs"
+	"github.com/blccming/hidden-live-location-server/docs"
+	_ "github.com/blccming/hidden-live-location-server/docs"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
