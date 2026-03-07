@@ -7,9 +7,10 @@
   - [ ] delete data of session after TTL timeout
   - [ ] terminate session after session timeout
 #### deployment
-- [ ] use docker containers for development / testing and deployment
+- [X] use docker containers for development / testing and deployment
 - [X] use environment variables for log levels and host/port configuration
 - [ ] add github actions for CI/CD (build binary and container image)
+- [ ] change network mode of cloudflared
 ### optimizations
 - [ ] "make secure"
   - [ ] use password authentication?

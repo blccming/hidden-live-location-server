@@ -10,7 +10,7 @@ services:
     ports:
       - "6379:6379"
 
-  pps:
+  hll:
     container_name: hll-server
     build:
       context: ..
@@ -28,7 +28,7 @@ services:
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     network_mode: host # VERY VERY TEMPORARY, REMOVE ASAP
     depends_on:
-      - pps
+      - hll
 
 volumes:
   valkey-data:
