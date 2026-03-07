@@ -1,16 +1,25 @@
 package main
 
 import (
+	"os"
+
 	"github.com/blccming/private-positioning-server/api"
 	"github.com/blccming/private-positioning-server/configuration"
-	"github.com/blccming/private-positioning-server/valkey"
+	"github.com/blccming/private-positioning-server/db"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
 	configuration.Configure() // remove later
 
-	valkey.InitializeValkey()
+	dbClient, err := db.Connect()
+	if err != nil {
+		log.Panic().Stack().Err(err).Msg("Failed to connect and configure database. Exiting ..")
+		os.Exit(1)
+	}
+
+	// TESTING ONLY
+	db.Test(dbClient)
 
 	// stop them from executing for testing valkey atm
 	if false {
