@@ -43,7 +43,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: hll-server
-        asset_name: hll-server-${{github.ref}}.exe
+        asset_name: hll-server-${{github.ref}}-linux-x86_64
         tag: ${{ github.ref }}
         overwrite: true
         body: "Releasing server ${{github.ref}}"
