@@ -21,13 +21,3 @@ jobs:
 
     - name: Build
       run: go build -o hll-server ./main.go
-
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref_name }} # Use the tag that triggered the workflow
-        files: hll-server
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for authentication
-        
