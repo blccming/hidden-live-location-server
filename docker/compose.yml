@@ -1,7 +1,7 @@
 ---
 services:
   valkey:
-    container_name: valkey
+    container_name: hll-dev-valkey
     image: valkey/valkey:9
     restart: always
     volumes:
@@ -11,7 +11,7 @@ services:
       - "6379:6379"
 
   hll:
-    container_name: hll-server
+    container_name: hll-dev-server
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -22,7 +22,7 @@ services:
       - valkey
 
   cloudflared:
-    container_name: cloudflared
+    container_name: hll-dev-cloudflared
     image: cloudflare/cloudflared:latest
     restart: always
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}

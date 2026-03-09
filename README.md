@@ -19,6 +19,7 @@
 - [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
 - [ ] Evaluate the usage of Valkey compared to Redis
+- [ ] test token generation / randomness -> only one session at a time
 
 ### Development
 Install docker with docker compose if not already installed.

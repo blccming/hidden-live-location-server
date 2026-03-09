@@ -1,7 +1,7 @@
 ---
 services:
   valkey:
-    container_name: valkey
+    container_name: hll-valkey
     image: valkey/valkey:9
     restart: always
     volumes:
@@ -10,7 +10,7 @@ services:
     ports:
       - "6379:6379"
 
-  pps:
+  hll:
     container_name: hll-server
     image: ghcr.io/blccming/hidden-live-location-server:main
     restart: always
@@ -20,13 +20,13 @@ services:
       - valkey
 
   cloudflared:
-    container_name: cloudflared
+    container_name: hll-cloudflared
     image: cloudflare/cloudflared:latest
     restart: always
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     network_mode: host # VERY VERY TEMPORARY, REMOVE ASAP
     depends_on:
-      - pps
+      - hll
 
 volumes:
   valkey-data:
