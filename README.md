@@ -2,24 +2,16 @@
 
 ### TODO
 #### storage
-- [ ] use redis to store location data for all users [TOKEN, LONGITUDE, LATIDUDE, TTL, TIMEOUT, LAST_UPDATE (, PW-HASH?)]
-- [ ] coroutine logic
-  - [ ] delete data of session after TTL timeout
-  - [ ] terminate session after session timeout
 #### deployment
-- [X] use docker containers for development / testing and deployment
-- [X] use environment variables for log levels and host/port configuration
-- [ ] add github actions for CI/CD (build binary and container image)
+- [ ] add valkey configuration parameters to env vars
 - [ ] change network mode of cloudflared
+
 ### optimizations
 - [ ] "make secure"
   - [ ] use password authentication?
-- [X] add rate limiter per-client (besides the global one)
-- [X] add proper logging (with zerolog?)
-- [X] file management
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
-- [ ] Evaluate the usage of Valkey compared to Redis
 - [ ] test token generation / randomness -> only one session at a time
+
 
 ### Development
 Install docker with docker compose if not already installed.

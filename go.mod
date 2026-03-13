@@ -1,6 +1,6 @@
 module github.com/blccming/hidden-live-location-server
 
-go 1.24.0
+go 1.24.9
 
 toolchain go1.24.13
 
@@ -10,6 +10,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
+	github.com/valkey-io/valkey-glide/go/v2 v2.2.7
 	golang.org/x/time v0.14.0
 )
 

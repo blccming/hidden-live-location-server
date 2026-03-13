@@ -4,6 +4,10 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/blccming/hidden-live-location-server/db"
+	"github.com/rs/zerolog/log"
+	glide "github.com/valkey-io/valkey-glide/go/v2"
 )
 
 var startup_time = time.Now()
@@ -13,16 +17,6 @@ func getRuntime() string {
 }
 
 /* tokens */
-// TODO: Remove this as soon as Redis will be used
-func tokenExists(token string) bool {
-	for _, session := range sessions {
-		if session.Token == token {
-			return true
-		}
-	}
-	return false
-}
-
 func tokenGenerate() string {
 	const length = 6
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -37,20 +31,16 @@ func tokenGenerate() string {
 	return string(b)
 }
 
-func tokenCreate() string {
+func tokenCreate(g *glide.Client) string {
 	for {
 		token := tokenGenerate()
-		if !tokenExists(token) {
+		exists, err := db.SessionExists(g, token)
+		if err != nil {
+			log.Error().Stack().Err(err).Msg("Failed to check session existence.")
+			continue
+		}
+		if !exists {
 			return token
 		}
 	}
-}
-
-func sessionTokenToIndex(token string) int {
-	for index, session := range sessions {
-		if session.Token == token {
-			return index
-		}
-	}
-	return -1
 }
