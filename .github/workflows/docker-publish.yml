@@ -7,10 +7,10 @@ name: Docker
 
 on:
   push:
-    branches: [ "main" ]
-    tags: [ 'v*.*.*' ]
+    branches: ["main"]
+    tags: ["v*.*.*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -18,10 +18,8 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,7 +38,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
         with:
-          cosign-release: 'v2.2.4'
+          cosign-release: "v2.2.4"
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
@@ -73,6 +71,7 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: .
+          platforms: linux/amd64, linux/arm64
           file: ./docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -94,4 +93,3 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
-  
