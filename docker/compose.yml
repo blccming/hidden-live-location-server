@@ -21,14 +21,5 @@ services:
     depends_on:
       - valkey
 
-  cloudflared:
-    container_name: hll-dev-cloudflared
-    image: cloudflare/cloudflared:latest
-    restart: always
-    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
-    network_mode: host # VERY VERY TEMPORARY, REMOVE ASAP
-    depends_on:
-      - hll
-
 volumes:
   valkey-data:
