@@ -18,15 +18,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TESTING ONLY
-	db.Test(dbClient)
+	ginCfg, debugMode := configuration.Configure()
 
-	// stop them from executing for testing valkey atm
-	if false {
-		ginCfg, debugMode := configuration.Configure()
+	r := api.InitEndpoints(debugMode, dbClient) // Use swagger if debugMode (logLevel is DEBUG or TRACE)
+	log.Info().Msgf("Server starting on %s.", ginCfg)
+	r.Run(ginCfg)
 
-		r := api.InitEndpoints(debugMode) // Use swagger if debugMode (logLevel is DEBUG or TRACE)
-		log.Info().Msgf("Server starting on %s.", ginCfg)
-		r.Run(ginCfg)
-	}
 }

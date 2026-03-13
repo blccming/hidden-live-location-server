@@ -22,23 +22,6 @@ func locationKey(token string) string {
 	return "session:" + token + ":loc"
 }
 
-// TESTING ONLY
-func Test(c *glide.Client) {
-	token := "AECD16"
-	var exists bool
-	exists, _ = SessionExists(c, token)
-	fmt.Println(exists)
-	AddSession(c, token, 3600, 30)
-	exists, _ = SessionExists(c, token)
-	fmt.Println(exists)
-	loc, _ := GetLocation(c, token)
-	fmt.Println(loc)
-	SetLocation(c, token, 123, 456)
-	loc, _ = GetLocation(c, token)
-	fmt.Println(loc)
-	RemoveSession(c, token)
-}
-
 // Connect initializes a Valkey client, verifies connectivity with PING,
 // applies basic configuration, and returns the connected client.
 func Connect() (*glide.Client, error) {

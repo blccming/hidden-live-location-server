@@ -3,32 +3,24 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/blccming/hidden-live-location-server/db"
 	"github.com/blccming/hidden-live-location-server/docs"
 	_ "github.com/blccming/hidden-live-location-server/docs"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	glide "github.com/valkey-io/valkey-glide/go/v2"
 )
-
-type Session struct {
-	Token      string    `json:"token"`
-	Latitude   float32   `json:"latitude"`
-	Longitude  float32   `json:"longitude"`
-	TTL        int       `json:"ttl"`
-	Timeout    int       `json:"timeout"`
-	LastUpdate time.Time `json:"last_update"`
-}
 
 type ErrorResponse struct {
 	Error string `json:"error" example:"invalid json"`
 }
 
-var sessions []Session
-
-func InitEndpoints(useSwagger bool) *gin.Engine {
+func InitEndpoints(useSwagger bool, dbClient *glide.Client) *gin.Engine {
 	r := gin.Default()
 	r.Use(PerClientRateLimit(5, 10)) // limit to 5 requests per second with burst of 10
 	r.Use(GlobalRateLimit(100, 10))  // limit to 100 requests per second with burst of 10
@@ -42,10 +34,10 @@ func InitEndpoints(useSwagger bool) *gin.Engine {
 
 	// our endpoints
 	r.GET("/health", getHealth)
-	r.POST("/session/create", postSessionCreate)
-	r.POST("/session/terminate", postSessionTerminate)
-	r.POST("/session/update", postSessionUpdate)
-	r.GET("/session/:token", getSession)
+	r.POST("/session/create", func(c *gin.Context) { postSessionCreate(c, dbClient) })
+	r.POST("/session/terminate", func(c *gin.Context) { postSessionTerminate(c, dbClient) })
+	r.POST("/session/update", func(c *gin.Context) { postSessionUpdate(c, dbClient) })
+	r.GET("/session/:token", func(c *gin.Context) { getSession(c, dbClient) })
 	log.Info().Msg("Finalized Gin initialization.")
 
 	return r
@@ -101,8 +93,7 @@ type SessionCreateResponse struct {
 // @Success      200      {object}  SessionCreateResponse
 // @Failure      400      {object}  ErrorResponse
 // @Router       /session/create [post]
-func postSessionCreate(c *gin.Context) {
-	var newSession Session
+func postSessionCreate(c *gin.Context, g *glide.Client) {
 	input := SessionCreateRequest{TTL: -1, SessionTimeout: -1}
 
 	if err := c.BindJSON(&input); err != nil {
@@ -117,19 +108,20 @@ func postSessionCreate(c *gin.Context) {
 		return
 	}
 
-	newSession.Token = tokenCreate()
-	newSession.TTL = input.TTL
-	newSession.Timeout = input.SessionTimeout
-
-	// TODO: dont directly modify sessions[] -> no need to fix, will switch to redis later
-	sessions = append(sessions, newSession)
+	token := tokenCreate(g)
+	err := db.AddSession(g, token, input.SessionTimeout, input.TTL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add session"})
+		log.Error().Stack().Err(err).Msg("Failed to add session.")
+		return
+	}
 
 	resp := SessionCreateResponse{
-		Token:  newSession.Token,
+		Token:  token,
 		Params: input,
 	}
 	c.JSON(http.StatusOK, resp)
-	log.Info().Msgf("Session created: %s", newSession.Token)
+	log.Info().Msgf("Session created: %s", token)
 }
 
 /*
@@ -154,7 +146,7 @@ type SessionTerminateResponse struct {
 // @Success      200              {object}  SessionTerminateResponse "successfully terminated session."
 // @Failure      400              {object}  ErrorResponse
 // @Router       /session/terminate [post]
-func postSessionTerminate(c *gin.Context) {
+func postSessionTerminate(c *gin.Context, g *glide.Client) {
 	var input struct {
 		Token string `json:"token"`
 	}
@@ -165,19 +157,24 @@ func postSessionTerminate(c *gin.Context) {
 		return
 	}
 
-	if !tokenExists(input.Token) {
+	exists, err := db.SessionExists(g, input.Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check session token existence"})
+		log.Error().Stack().Err(err).Msgf("Failed to check session token existence: %s", input.Token)
+		return
+	}
+	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
 		log.Error().Msgf("Session token does not exist: %s", input.Token)
 		return
 	}
 
-	index := sessionTokenToIndex(input.Token)
-	if index == -1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
-		log.Error().Msgf("Error while searching for session struct via Token: %s", input.Token)
+	err = db.RemoveSession(g, input.Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete session"})
+		log.Error().Stack().Err(err).Msgf("Failed to delete session: %s", input.Token)
 		return
 	}
-	sessions = append(sessions[:index], sessions[index+1:]...)
 
 	resp := SessionTerminateResponse{
 		Message: "successfully terminated session.",
@@ -192,8 +189,8 @@ func postSessionTerminate(c *gin.Context) {
  */
 type SessionUpdateRequest struct {
 	Token     string  `json:"token" example:"3A9N2O"`
-	Longitude float32 `json:"longitude" example:"49.026598"`
-	Latitude  float32 `json:"latitude" example:"8.385259"`
+	Longitude float64 `json:"longitude" example:"49.026598"`
+	Latitude  float64 `json:"latitude" example:"8.385259"`
 }
 
 type SessionUpdateResponse struct {
@@ -211,7 +208,7 @@ type SessionUpdateResponse struct {
 // @Success      200      {object} SessionUpdateResponse "Session updated."
 // @Failure      400      {object} ErrorResponse
 // @Router       /session/update [post]
-func postSessionUpdate(c *gin.Context) {
+func postSessionUpdate(c *gin.Context, g *glide.Client) {
 	var input SessionUpdateRequest
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("%e", err)})
@@ -219,22 +216,25 @@ func postSessionUpdate(c *gin.Context) {
 		return
 	}
 
-	if !tokenExists(input.Token) {
+	exists, err := db.SessionExists(g, input.Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check session token existence"})
+		log.Error().Stack().Err(err).Msgf("Failed to check session token existence: %s.", input.Token)
+		return
+	}
+
+	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
 		log.Error().Msgf("Session token does not exist: %s", input.Token)
 		return
 	}
 
-	index := sessionTokenToIndex(input.Token)
-	if index == -1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
-		log.Error().Msgf("Error while searching for session struct via Token: %s", input.Token)
+	err = db.SetLocation(g, input.Token, input.Longitude, input.Latitude)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update session location"})
+		log.Error().Stack().Err(err).Msgf("Failed to update session location: %s", input.Token)
 		return
 	}
-
-	sessions[index].Longitude = input.Longitude
-	sessions[index].Latitude = input.Latitude
-	sessions[index].LastUpdate = time.Now()
 
 	resp := SessionUpdateResponse{
 		Message: "successfully updated session.",
@@ -250,8 +250,8 @@ func postSessionUpdate(c *gin.Context) {
  */
 type SessionGetResponse struct {
 	Token      string    `json:"token" example:"3A9N2O"`
-	Longitude  float32   `json:"longitude" example:"49.026598"`
-	Latitude   float32   `json:"latitude" example:"8.385259"`
+	Longitude  float64   `json:"longitude" example:"49.026598"`
+	Latitude   float64   `json:"latitude" example:"8.385259"`
 	LastUpdate time.Time `json:"last_update" example:"2026-03-01T13:23:45.206365244+01:00"`
 }
 
@@ -265,33 +265,64 @@ type SessionGetResponse struct {
 // @Success      200     {object}  SessionGetResponse "Session retrieved."
 // @Failure      400     {object}  ErrorResponse
 // @Router       /session/{token} [get]
-func getSession(c *gin.Context) {
+func getSession(c *gin.Context, g *glide.Client) {
 	token := c.Param("token")
 
-	if !tokenExists(token) {
+	exists, err := db.SessionExists(g, token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check session token existence"})
+		log.Error().Stack().Err(err).Msgf("Failed to check session token existence: %s.", token)
+		return
+	}
+	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "session token does not exist."})
-		log.Error().Msgf("Session token does not exist: %s", token)
+		log.Error().Msgf("Session token does not exist: %s.", token)
 		return
 	}
 
-	index := sessionTokenToIndex(token)
-	if index == -1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "error while searching for session struct."})
-		log.Error().Msgf("Error while searching for session struct via Token: %s", token)
+	locData, err := db.GetLocation(g, token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get location data"})
+		log.Error().Stack().Err(err).Msgf("Failed to get location data for session: %s", token)
 		return
 	}
 
-	if sessions[index].LastUpdate.IsZero() {
+	if locData == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "no location data available yet."})
 		log.Error().Msgf("No location data available for session: %s", token)
 		return
-	} // TODO: after data expiration is implemented, make sure, this is still correct
+	}
+
+	lonStr := locData["longitude"]
+	latStr := locData["latitude"]
+	lastChangedStr := locData["lastChanged"]
+
+	lon, err := strconv.ParseFloat(lonStr, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse longitude"})
+		log.Error().Stack().Err(err).Msgf("Failed to parse longitude for session: %s", token)
+		return
+	}
+
+	lat, err := strconv.ParseFloat(latStr, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse latitude"})
+		log.Error().Stack().Err(err).Msgf("Failed to parse latitude for session: %s", token)
+		return
+	}
+
+	t, err := time.Parse(time.RFC3339, lastChangedStr) // or your format
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse lastChanged"})
+		log.Error().Stack().Err(err).Msgf("Failed to parse lastChanged for session: %s", token)
+		return
+	}
 
 	resp := SessionGetResponse{
-		Token:      sessions[index].Token,
-		Longitude:  sessions[index].Longitude,
-		Latitude:   sessions[index].Latitude,
-		LastUpdate: sessions[index].LastUpdate,
+		Token:      token,
+		Longitude:  lon,
+		Latitude:   lat,
+		LastUpdate: t,
 	}
 	c.JSON(http.StatusOK, resp)
 
