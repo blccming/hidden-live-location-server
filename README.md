@@ -2,19 +2,16 @@
 
 ### TODO
 #### storage
-- [X] **use valkey to store location data for all users**
-- [X] **expiration logic in valkey**
-  - [X] delete location data of session after TTL timeout (different namespace from session data)
-  - [X] terminate session after session timeout
-- [ ] use valkey api in endpoints.go
 #### deployment
-- [ ] use docker containers for development / testing and deployment
 - [ ] add valkey configuration parameters to env vars
-- [ ] add github actions for CI/CD (build binary and container image)
+- [ ] change network mode of cloudflared
+
 ### optimizations
 - [ ] "make secure"
   - [ ] use password authentication?
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
+- [ ] test token generation / randomness -> only one session at a time
+
 
 ### Development
 Install docker with docker compose if not already installed.
