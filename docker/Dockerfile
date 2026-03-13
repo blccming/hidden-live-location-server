@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go application (main.go is in the project root)
-ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+ENV CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOFLAGS=-tags=musl
 RUN go build -o hidden-live-location-server .
 
 # Runtime image
