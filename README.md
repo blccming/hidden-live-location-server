@@ -4,6 +4,7 @@
 #### storage
 #### deployment
 - [ ] add valkey maxmem configuration to env vars
+- [ ] add docker images for arm64
 
 ### optimizations
 - [ ] "make secure"

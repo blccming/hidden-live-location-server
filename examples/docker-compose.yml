@@ -15,8 +15,8 @@ services:
     image: ghcr.io/blccming/hidden-live-location-server:main
     restart: always
     environment:
-      - LOGLEVEL=WARN
-      - HOST=0.0.0.0
+      - LOGLEVEL=INFO
+      - HOST=hll
       - PORT=8080
       - DB_HOST=valkey
       - DB_PORT=6379 # default valkey/redis port
@@ -26,7 +26,7 @@ services:
     networks:
       - hll-network
 
-  cloudflared:
+  cloudflared: # make sure you configure the tunnel to point to hll:8080
     container_name: hll-cloudflared
     image: cloudflare/cloudflared:latest
     restart: always
