@@ -19,6 +19,9 @@ services:
     ports:
       - "8080:8080"
     environment:
+      - LOG_LEVEL=DEBUG
+      - HOST=0.0.0.0
+      - PORT=8080
       - DB_HOST=valkey
       - DB_PORT=6379
       - DB_PASSWORD=${VALKEY_PASSWORD}

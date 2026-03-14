@@ -1,7 +1,6 @@
 ## hidden live location server
 
 ### TODO
-#### storage
 #### deployment
 - [ ] add valkey maxmem configuration to env vars
 - [ ] add docker images for arm64
@@ -10,7 +9,7 @@
 - [ ] "make secure"
   - [ ] use password authentication?
 - [ ] Use links to share location session => make link directly redirect to app (this is mostly handled client-side)
-- [ ] test token generation / randomness -> only one session at a time
+- [ ] update README with production deployment instructions
 
 
 ### Development

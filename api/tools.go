@@ -1,8 +1,7 @@
 package api
 
 import (
-	"math/rand"
-	"os"
+	crand "crypto/rand"
 	"time"
 
 	"github.com/blccming/hidden-live-location-server/db"
@@ -17,23 +16,32 @@ func getRuntime() string {
 }
 
 /* tokens */
-func tokenGenerate() string {
+func tokenGenerate() (string, error) {
 	const length = 6
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano() & int64(os.Getpid())))
-
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset))]
+	// rand bytes
+	rb := make([]byte, length)
+	if _, err := crand.Read(rb); err != nil {
+		return "", err
 	}
 
-	return string(b)
+	// token in bytes
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[int(rb[i])%len(charset)]
+	}
+
+	return string(b), nil
 }
 
 func tokenCreate(g *glide.Client) string {
 	for {
-		token := tokenGenerate()
+		token, err := tokenGenerate()
+		if err != nil {
+			log.Error().Stack().Err(err).Msg("Failed to generate token.")
+			continue
+		}
 		exists, err := db.SessionExists(g, token)
 		if err != nil {
 			log.Error().Stack().Err(err).Msg("Failed to check session existence.")

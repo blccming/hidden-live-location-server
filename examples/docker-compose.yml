@@ -12,7 +12,7 @@ services:
 
   hll:
     container_name: hll-server
-    image: ghcr.io/blccming/hidden-live-location-server:main
+    image: ghcr.io/blccming/hidden-live-location-server:latest
     restart: always
     environment:
       - LOGLEVEL=INFO
