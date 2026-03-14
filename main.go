@@ -10,18 +10,15 @@ import (
 )
 
 func main() {
-	configuration.Configure() // remove later
+	cfg := configuration.Configure()
 
-	dbClient, err := db.Connect()
+	dbClient, err := db.Connect(cfg.DBHost, cfg.DBPort, cfg.DBPass)
 	if err != nil {
 		log.Panic().Stack().Err(err).Msg("Failed to connect and configure database. Exiting ..")
 		os.Exit(1)
 	}
 
-	ginCfg, debugMode := configuration.Configure()
-
-	r := api.InitEndpoints(debugMode, dbClient) // Use swagger if debugMode (logLevel is DEBUG or TRACE)
-	log.Info().Msgf("Server starting on %s.", ginCfg)
-	r.Run(ginCfg)
-
+	r := api.InitEndpoints(cfg.LogLevel == "DEBUG" || cfg.LogLevel == "TRACE", dbClient)
+	log.Info().Msgf("Server starting on %s.", cfg.Host+":"+cfg.Port)
+	r.Run(cfg.Host + ":" + cfg.Port)
 }

@@ -22,14 +22,7 @@ func locationKey(token string) string {
 	return "session:" + token + ":loc"
 }
 
-// Connect initializes a Valkey client, verifies connectivity with PING,
-// applies basic configuration, and returns the connected client.
-func Connect() (*glide.Client, error) {
-	// TODO: make these configurable via environment variable
-	host := "localhost"
-	port := 6379
-	password := "YOUR_PASSWORD_HERE"
-
+func Connect(host string, port int, password string) (*glide.Client, error) {
 	config := config.NewClientConfiguration().
 		WithAddress(&config.NodeAddress{Host: host, Port: port}).
 		WithCredentials(config.NewServerCredentials("", password)).

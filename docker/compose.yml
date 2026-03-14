@@ -7,8 +7,8 @@ services:
     volumes:
       - valkey-data:/data
     command: valkey-server --requirepass ${VALKEY_PASSWORD}
-    ports:
-      - "6379:6379"
+    networks:
+      - hll-network
 
   hll:
     container_name: hll-dev-server
@@ -18,8 +18,18 @@ services:
     restart: always
     ports:
       - "8080:8080"
+    environment:
+      - DB_HOST=valkey
+      - DB_PORT=6379
+      - DB_PASSWORD=${VALKEY_PASSWORD}
     depends_on:
       - valkey
+    networks:
+      - hll-network
 
 volumes:
   valkey-data:
+
+networks:
+  hll-network:
+    driver: bridge

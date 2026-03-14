@@ -8,16 +8,23 @@ services:
       - valkey-data:/data
     command: valkey-server --requirepass ${VALKEY_PASSWORD}
     networks:
-      - hll-net
+      - hll-network
 
   hll:
     container_name: hll-server
     image: ghcr.io/blccming/hidden-live-location-server:main
     restart: always
+    environment:
+      - LOGLEVEL=WARN
+      - HOST=0.0.0.0
+      - PORT=8080
+      - DB_HOST=valkey
+      - DB_PORT=6379 # default valkey/redis port
+      - DB_PASSWORD=${VALKEY_PASSWORD}
     depends_on:
       - valkey
     networks:
-      - hll-net
+      - hll-network
 
   cloudflared:
     container_name: hll-cloudflared
@@ -27,11 +34,11 @@ services:
     depends_on:
       - hll
     networks:
-      - hll-net
+      - hll-network
 
 volumes:
   valkey-data:
 
 networks:
-  hll-net:
+  hll-network:
     driver: bridge

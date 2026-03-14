@@ -3,8 +3,7 @@
 ### TODO
 #### storage
 #### deployment
-- [ ] add valkey configuration parameters to env vars
-- [ ] change network mode of cloudflared
+- [ ] add valkey maxmem configuration to env vars
 
 ### optimizations
 - [ ] "make secure"
